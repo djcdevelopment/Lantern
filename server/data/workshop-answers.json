@@ -1,0 +1,310 @@
+{
+  "what killed me on pull 6?": {
+    "question": "What killed me on pull 6?",
+    "trace": [
+      {
+        "state": "done",
+        "label": "Located pull",
+        "detail": "Mug'Zee · Pull 6 · 06:20 duration"
+      },
+      {
+        "state": "done",
+        "label": "Filtered to player",
+        "detail": "Durracktu (Disc Priest)"
+      },
+      {
+        "state": "done",
+        "label": "Scanned combat log",
+        "detail": "4 ability events in 3s prior to death"
+      },
+      {
+        "state": "done",
+        "label": "Read encounter timeline",
+        "detail": "Cluster Bomb cast group (3 casts)"
+      },
+      {
+        "state": "done",
+        "label": "Cross-referenced movement",
+        "detail": "Replay frames 04:30.2 – 04:32.7"
+      }
+    ],
+    "body": [
+      "You died at ",
+      {
+        "cite": "04:32",
+        "ref": "replay",
+        "t": 272
+      },
+      " on pull 6, four minutes thirty-two seconds into the pull. Death was caused by a single instance of ",
+      {
+        "cite": "Cluster Bomb · 487k",
+        "ref": "log"
+      },
+      " landing on you while you were stationary.",
+      "br",
+      "Before death you were channeling ",
+      {
+        "cite": "Penance",
+        "ref": "log"
+      },
+      " on Karthuun for 1.4 seconds. ",
+      "Cluster Bomb has a 4-second cast and a visible ground marker; the marker appeared at ",
+      {
+        "cite": "04:28.6",
+        "ref": "replay",
+        "t": 268
+      },
+      " and you remained inside it.",
+      "br",
+      "Three other raiders moved out within 0.8s of the marker spawn. You did not move until impact at ",
+      {
+        "cite": "04:32.5",
+        "ref": "replay",
+        "t": 272
+      },
+      ".",
+      "br-strong",
+      {
+        "kind": "callout",
+        "title": "Most likely cause",
+        "body": "Channeled cast was not cancelled when the marker appeared under you. Pain Suppression was on cooldown (used 50s prior). No other defensive was available."
+      }
+    ],
+    "sources": [
+      {
+        "type": "Replay",
+        "label": "Mug'Zee · Pull 6",
+        "t": "04:28 – 04:33"
+      },
+      {
+        "type": "Log",
+        "label": "Combat log line 14,028 – 14,056"
+      },
+      {
+        "type": "Encounter",
+        "label": "Cluster Bomb · ability metadata"
+      }
+    ]
+  },
+  "why did this cohort collapse?": {
+    "question": "Why did this cohort collapse?",
+    "cohortId": "collapse",
+    "trace": [
+      {
+        "state": "done",
+        "label": "Resolved cohort",
+        "detail": "3 healers · Durracktu, Veshrin, Maelka"
+      },
+      {
+        "state": "done",
+        "label": "Located timeline range",
+        "detail": "Mug'Zee · Pull 6 · 04:00 – 05:20"
+      },
+      {
+        "state": "done",
+        "label": "Filtered combat log",
+        "detail": "61 events involving cohort members"
+      },
+      {
+        "state": "done",
+        "label": "Computed proximity",
+        "detail": "Mean pairwise distance over 80s window"
+      },
+      {
+        "state": "done",
+        "label": "Cross-referenced replay",
+        "detail": "Frames 04:00.0 – 05:20.0"
+      }
+    ],
+    "body": [
+      "The cohort held together until ",
+      {
+        "cite": "04:00",
+        "ref": "replay",
+        "t": 240
+      },
+      ", when phase 3 began and Cluster Bombs forced a spread. ",
+      "Average pairwise distance rose from ",
+      {
+        "cite": "20 yd → 62 yd",
+        "ref": "log"
+      },
+      " in eighteen seconds.",
+      "br",
+      "During the spread, Durracktu remained inside a marker and died at ",
+      {
+        "cite": "04:32",
+        "ref": "replay",
+        "t": 272
+      },
+      ". ",
+      "Veshrin committed Tranquility 18 seconds late, at ",
+      {
+        "cite": "04:28",
+        "ref": "log"
+      },
+      " — by then the cohort was beyond healing range of each other.",
+      "br",
+      "Maelka attempted a battle-resurrection at ",
+      {
+        "cite": "04:46",
+        "ref": "replay",
+        "t": 286
+      },
+      " and was caught between two adds.",
+      "br-strong",
+      {
+        "kind": "callout",
+        "title": "Most likely cause",
+        "body": "The cohort collapsed because the spread mechanic pulled it past its own healing radius before any of the three could commit a raid cooldown. Earlier Tranquility (within 8s of marker) would have held the group."
+      }
+    ],
+    "sources": [
+      {
+        "type": "Replay",
+        "label": "Mug'Zee · Pull 6",
+        "t": "04:00 – 05:20"
+      },
+      {
+        "type": "Log",
+        "label": "Combat log line 13,840 – 14,201"
+      },
+      {
+        "type": "Cohort",
+        "label": "Durracktu + Veshrin + Maelka"
+      }
+    ]
+  },
+  "show cooldown overlap during phase transition.": {
+    "question": "Show cooldown overlap during phase transition.",
+    "cohortId": "extcd",
+    "trace": [
+      {
+        "state": "done",
+        "label": "Resolved cohort",
+        "detail": "4 raiders · 1 healer, 2 tanks, 1 healer"
+      },
+      {
+        "state": "done",
+        "label": "Located timeline range",
+        "detail": "Mug'Zee · Pull 6 · 00:28 – 01:32"
+      },
+      {
+        "state": "done",
+        "label": "Extracted cast events",
+        "detail": "9 defensive casts in 64s"
+      },
+      {
+        "state": "done",
+        "label": "Computed overlap",
+        "detail": "Pairwise temporal overlap matrix"
+      }
+    ],
+    "body": [
+      "During add wave 1 the external cooldown chain landed cleanly. Four defensives overlapped within a ",
+      {
+        "cite": "26-second window",
+        "ref": "log"
+      },
+      ", and at no point was Karthuun without coverage.",
+      "br",
+      {
+        "kind": "callout",
+        "title": "Observation",
+        "body": "Pain Suppression and Ardent Defender overlapped for 6 seconds. Ironbark handed off to Brorvik with a 2-second gap — clean. This is the strongest external chain of the night."
+      },
+      "br",
+      "Compare to the second add wave at ",
+      {
+        "cite": "06:08",
+        "ref": "replay",
+        "t": 368
+      },
+      ", where two of these cooldowns were still on cooldown — the raid wiped 14 seconds later."
+    ],
+    "sources": [
+      {
+        "type": "Replay",
+        "label": "Mug'Zee · Pull 6",
+        "t": "00:28 – 01:32"
+      },
+      {
+        "type": "Log",
+        "label": "Combat log line 12,402 – 12,488"
+      },
+      {
+        "type": "Cohort",
+        "label": "Durracktu + Karthuun + Brorvik + Veshrin"
+      }
+    ]
+  },
+  "which ranged stayed grouped during spread?": {
+    "question": "Which ranged stayed grouped during spread?",
+    "cohortId": "spread",
+    "trace": [
+      {
+        "state": "done",
+        "label": "Resolved cohort",
+        "detail": "4 ranged DPS"
+      },
+      {
+        "state": "done",
+        "label": "Located mechanic",
+        "detail": "Cluster Bomb spread · 03:35 – 04:40"
+      },
+      {
+        "state": "done",
+        "label": "Read movement frames",
+        "detail": "Frame intervals every 100ms"
+      },
+      {
+        "state": "done",
+        "label": "Computed individual reaction times",
+        "detail": "Marker appearance → first lateral movement"
+      }
+    ],
+    "body": [
+      "Three of four ranged moved within ",
+      {
+        "cite": "1.2 seconds",
+        "ref": "log"
+      },
+      " of the marker. Volgrim moved at ",
+      {
+        "cite": "+28s",
+        "ref": "replay",
+        "t": 248
+      },
+      " and survived only because Astral Shift was up.",
+      "br",
+      "After the spread, the cohort regrouped to a 6-yard radius by ",
+      {
+        "cite": "04:48",
+        "ref": "replay",
+        "t": 288
+      },
+      ".",
+      "br-strong",
+      {
+        "kind": "callout",
+        "title": "Observation",
+        "body": "The ranged cluster handled the mechanic well. The single divergence cost no death and was followed by a clean regroup. This is a working coordination pattern."
+      }
+    ],
+    "sources": [
+      {
+        "type": "Replay",
+        "label": "Mug'Zee · Pull 6",
+        "t": "03:35 – 04:40"
+      },
+      {
+        "type": "Cohort",
+        "label": "Sirelle + Olben + Pyrrhic + Volgrim"
+      },
+      {
+        "type": "Encounter",
+        "label": "Cluster Bomb · mechanic metadata"
+      }
+    ]
+  }
+}

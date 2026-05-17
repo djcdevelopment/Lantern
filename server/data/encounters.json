@@ -1,0 +1,11 @@
+{
+  "_meta": {
+    "description": "Per-boss mechanic data (q12). Keyed by bossName as it appears in PullReplay.bossName. hasFallMechanic = the fight itself launches or knocks the raid into the air and inflicts Falling damage, so a fall burst CANNOT be read as a called-wipe jump on this boss — collapse detection must disable the jump signal there.",
+    "source": "Derek (domain knowledge), confirmed against the 2026-04-18 fixture."
+  },
+  "Crown of the Cosmos": {
+    "encounterId": 3181,
+    "hasFallMechanic": true,
+    "note": "Every intermission phase knocks the entire raid into the air; the raid takes Falling damage on the way down. Recurs once per intermission — it is the fight, not a wipe-jump."
+  }
+}

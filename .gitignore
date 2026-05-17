@@ -1,0 +1,14 @@
+node_modules
+dist
+dist-ssr
+*.local
+.vite
+.DS_Store
+*.tsbuildinfo
+
+# Generated cloud blobs (npm run prerender / build:cloud)
+public/api/
+
+# Live server state — seeded from server/data/*.seed.json on first run
+server/data/notebook.json
+server/data/observations.json

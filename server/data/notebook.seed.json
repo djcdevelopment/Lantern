@@ -1,0 +1,97 @@
+[
+  {
+    "id": "n1",
+    "text": "I keep dying to Cluster Bomb when I'm channeling Penance. Need to bind a cancel-cast macro on Mug'Zee. Maelka mentioned the same problem on the discord — she found a WeakAura.",
+    "tags": [
+      "self",
+      "mechanic"
+    ],
+    "binding": {
+      "kind": "cohort",
+      "scenarioId": "collapse",
+      "label": "Phase 3 healing collapse"
+    },
+    "createdAt": "5 minutes ago",
+    "pinned": true
+  },
+  {
+    "id": "n2",
+    "text": "Veshrin's Tranquility went 18 seconds late tonight. Was that a positioning problem, or was she covering something? Ask the model with pull 6 context.",
+    "tags": [
+      "ask-later",
+      "cooldowns"
+    ],
+    "binding": {
+      "kind": "cohort",
+      "scenarioId": "collapse",
+      "label": "Phase 3 healing collapse"
+    },
+    "createdAt": "12 minutes ago"
+  },
+  {
+    "id": "n3",
+    "text": "External CD chain on pull 6 was the cleanest of the night. Karthuun's AD into PS into Ironbark hand-off into Brorvik's IBF — zero gaps. Worth keeping as a reference for future progression.",
+    "tags": [
+      "cooldowns",
+      "progression"
+    ],
+    "binding": {
+      "kind": "cohort",
+      "scenarioId": "extcd",
+      "label": "External CD chain"
+    },
+    "createdAt": "34 minutes ago"
+  },
+  {
+    "id": "n4",
+    "text": "Say thanks to Maelka in the next retro — she's brought Cauldron three raids in a row, and dropped it before progression pulls each time.",
+    "tags": [
+      "thanks"
+    ],
+    "binding": {
+      "kind": "raid",
+      "raidId": "2026-05-12",
+      "label": "Undermine Heroic · 12 May"
+    },
+    "createdAt": "1 hour ago"
+  },
+  {
+    "id": "n5",
+    "text": "Next progression night: pre-position on the left platform before phase 3 transition. The center is where Cluster Bombs always seem to land.",
+    "tags": [
+      "progression",
+      "mechanic"
+    ],
+    "binding": null,
+    "createdAt": "yesterday"
+  },
+  {
+    "id": "n6",
+    "text": "Curiosity: do I always die to the same mechanic on Mug'Zee phase 3? Last three raids — same boss, same phase. Worth checking.",
+    "tags": [
+      "ask-later",
+      "self"
+    ],
+    "binding": {
+      "kind": "encounter",
+      "encounterId": "mugzee",
+      "label": "Mug'Zee · across raids"
+    },
+    "createdAt": "yesterday"
+  },
+  {
+    "id": "n7",
+    "text": "Rapture window on pull 6 was perfect. Used it right as add wave 2 spawned — caught the spike heal damage. This is the timing I want to repeat.",
+    "tags": [
+      "self",
+      "cooldowns"
+    ],
+    "binding": {
+      "kind": "pull",
+      "raidId": "2026-05-12",
+      "pullId": "p18",
+      "label": "Mug'Zee · Pull 6 · 04:05"
+    },
+    "createdAt": "yesterday"
+  }
+]

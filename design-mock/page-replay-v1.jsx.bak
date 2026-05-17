@@ -1,0 +1,501 @@
+/* global React, window */
+// /replay — advanced replay surface with ephemeral cohort selection.
+
+const { useState: useStateP, useEffect: useEffectP, useMemo: useMemoP } = React;
+
+const ReplayPage = ({ setRoute, cohortContext, setCohortContext }) => {
+  const [t, setT] = useStateP(cohortContext?.t || 272);
+  const [playing, setPlaying] = useStateP(false);
+  const [overlay, setOverlay] = useStateP("cohesion"); // 'none' | 'cohesion' | 'supportchain' | 'movement'
+  const dur = 380;
+
+  // Cohort selection — ephemeral, lives here unless the context bar passed one in.
+  const [selectedNames, setSelectedNames] = useStateP(() =>
+    cohortContext?.members || ["Durracktu"]
+  );
+  const [scenarioId, setScenarioId] = useStateP(cohortContext?.scenarioId || null);
+  const [activePreset, setActivePreset] = useStateP(null);
+
+  useEffectP(() => {
+    if (!playing) return;
+    const id = setInterval(() => setT(p => p >= dur ? 0 : p + 1), 100);
+    return () => clearInterval(id);
+  }, [playing]);
+
+  // React to a new cohortContext.t arriving (e.g. Workshop cite click).
+  useEffectP(() => {
+    if (cohortContext?.t != null) {
+      setT(cohortContext.t);
+      if (cohortContext.scenarioId) {
+        setScenarioId(cohortContext.scenarioId);
+        setSelectedNames(cohortContext.members);
+      } else if (cohortContext.members) {
+        setSelectedNames(cohortContext.members);
+      }
+    }
+  }, [cohortContext?.t, cohortContext?.scenarioId]);
+
+  const togglePlayer = (name) => {
+    setActivePreset(null);
+    setScenarioId(null);
+    setSelectedNames(prev => {
+      if (prev.includes(name)) {
+        if (name === "Durracktu") return prev; // pinned
+        return prev.filter(n => n !== name);
+      }
+      if (prev.length >= 6) return prev; // cap
+      return [...prev, name];
+    });
+  };
+
+  const applyPreset = (preset) => {
+    setScenarioId(null);
+    setActivePreset(preset.id);
+    const names = preset.pick(window.ROSTER);
+    // Always include the player.
+    const merged = ["Durracktu", ...names.filter(n => n !== "Durracktu")].slice(0, 6);
+    setSelectedNames(merged);
+  };
+
+  const applyScenario = (id) => {
+    const s = window.COHORT_SCENARIOS[id];
+    if (!s) return;
+    setScenarioId(id);
+    setActivePreset(null);
+    setSelectedNames(s.members);
+    setT(s.t);
+  };
+
+  const clearCohort = () => {
+    setActivePreset(null);
+    setScenarioId(null);
+    setSelectedNames(["Durracktu"]);
+  };
+
+  // Resolve scenario object for cohort cards.
+  const scenario = scenarioId ? window.COHORT_SCENARIOS[scenarioId] : null;
+  // If players are picked but no scenario, build an ephemeral scenario object
+  // so cohort cards can still infer reasonable defaults (we map to the closest
+  // scenario by membership overlap; otherwise show 'collapse' as a base).
+  const inferredScenario = useMemoP(() => {
+    if (scenario) return scenario;
+    if (selectedNames.length <= 1) return null;
+    // Pick the scenario with maximum member overlap.
+    let best = null, bestScore = -1;
+    for (const id of Object.keys(window.COHORT_SCENARIOS)) {
+      const s = window.COHORT_SCENARIOS[id];
+      const score = s.members.filter(n => selectedNames.includes(n)).length;
+      if (score > bestScore) { best = s; bestScore = score; }
+    }
+    return best;
+  }, [scenarioId, selectedNames]);
+
+  const askAboutCohort = (s) => {
+    setCohortContext({
+      scenarioId: s.id,
+      members: s.members,
+      range: s.range,
+      pullId: s.pullId,
+      pullLabel: s.pullLabel,
+      t: s.t,
+    });
+    setRoute("ask");
+  };
+
+  const askAboutMoment = () => {
+    setCohortContext({
+      scenarioId: null,
+      members: selectedNames,
+      range: [Math.max(0, t - 10), Math.min(dur, t + 10)],
+      pullId: "p18",
+      pullLabel: "Mug'Zee · Pull 6",
+      t,
+    });
+    setRoute("ask");
+  };
+
+  return (
+    <div className="page">
+      <div className="review-header" style={{marginBottom: 18}}>
+        <div>
+          <div className="breadcrumb">
+            <a onClick={() => setRoute("raids/2026-05-12")}>Raid review</a>
+            <span style={{margin: "0 6px"}}>›</span>
+            <span style={{color: "var(--text)"}}>Mug'Zee · Pull 6</span>
+          </div>
+          <h1>Replay <em style={{color: "var(--ember)"}}>advanced</em></h1>
+          <div className="sub">Boss 7 · Pull 6 · 06:20 · wipe at 06:18</div>
+        </div>
+        <div className="row" style={{gap: 8}}>
+          <button className="btn small" onClick={() => setOverlay("cohesion")}>
+            <Icon name="cog" size={12} /> Layers
+          </button>
+          <button className="btn small" onClick={askAboutMoment}>
+            <Icon name="ask" size={12} /> Ask about this moment
+          </button>
+        </div>
+      </div>
+
+      {/* Cohort preset pills */}
+      <div style={{display: "flex", gap: 16, alignItems: "center", marginBottom: 14, flexWrap: "wrap"}}>
+        <span className="h-eyebrow" style={{margin: 0}}>Cohort</span>
+        <div className="preset-pills">
+          {window.COHORT_PRESETS.map(p => (
+            <span key={p.id}
+                  className={`preset-pill ${activePreset === p.id ? "active" : ""}`}
+                  onClick={() => applyPreset(p)}>
+              <span className="pp-ico">{p.ico}</span>
+              {p.label}
+            </span>
+          ))}
+          <span style={{width: 1, height: 18, background: "var(--border)", margin: "0 4px"}}></span>
+          <span className="preset-pill" onClick={() => applyScenario("collapse")}>Phase 3 collapse</span>
+          <span className="preset-pill" onClick={() => applyScenario("extcd")}>External CD chain</span>
+          <span className="preset-pill" onClick={() => applyScenario("spread")}>Cluster Bomb spread</span>
+          {selectedNames.length > 1 && (
+            <span className="preset-pill" onClick={clearCohort} style={{color: "var(--text-mute)"}}>
+              <Icon name="close" size={11} /> Clear
+            </span>
+          )}
+        </div>
+        <span style={{marginLeft: "auto", fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--text-faint)"}}>
+          {selectedNames.length} of 6 selected · Durracktu pinned
+        </span>
+      </div>
+
+      <div className="replay-grid">
+        {/* LEFT: arena + roster strip + scrubber */}
+        <div>
+          <ReplayArena
+            t={t}
+            selectedNames={selectedNames}
+            overlay={overlay}
+          />
+          <RosterStrip
+            roster={window.ROSTER}
+            selectedNames={selectedNames}
+            onToggle={togglePlayer}
+          />
+
+          <div className="replay-controls" style={{marginTop: 12}}>
+            <div className="play" onClick={() => setPlaying(!playing)}>
+              <Icon name={playing ? "pause" : "play"} size={14} stroke={2.2} />
+            </div>
+            <div className="scrubber" onClick={(e) => {
+              const r = e.currentTarget.getBoundingClientRect();
+              const ratio = (e.clientX - r.left) / r.width;
+              setT(Math.max(0, Math.min(dur, Math.round(ratio * dur))));
+            }}>
+              <div className="filled" style={{width: `${(t/dur)*100}%`}}></div>
+              <div className="knob" style={{left: `${(t/dur)*100}%`}}></div>
+              {inferredScenario && (
+                <div style={{
+                  position: "absolute",
+                  left: `${(inferredScenario.range[0]/dur)*100}%`,
+                  width: `${((inferredScenario.range[1]-inferredScenario.range[0])/dur)*100}%`,
+                  top: -3, bottom: -3,
+                  background: "oklch(0.78 0.13 60 / 0.18)",
+                  border: "1px solid var(--ember)",
+                  borderRadius: 3,
+                  pointerEvents: "none",
+                }}></div>
+              )}
+              {window.PULL_EVENTS.map((e, i) => (
+                <div key={i} style={{
+                  position: "absolute",
+                  left: `${(e.t/dur)*100}%`,
+                  top: -3, bottom: -3,
+                  width: 2,
+                  background: e.kind === "death" ? "var(--bad)" : e.kind === "save" ? "var(--good)" : "var(--ember-deep)",
+                  opacity: 0.7,
+                  transform: "translateX(-1px)",
+                  cursor: "pointer",
+                }} title={e.label} onClick={(ev) => { ev.stopPropagation(); setT(e.t); }}></div>
+              ))}
+            </div>
+            <div className="time">
+              {fmtT(t)} / {fmtT(dur)}
+            </div>
+          </div>
+
+          {/* Replay → Workshop bridges */}
+          <div className="replay-actions" style={{marginTop: 14}}>
+            <button className="ra-btn" onClick={askAboutMoment}>
+              <span className="ra-ico"><Icon name="ask" size={13} /></span>
+              Ask about this moment
+            </button>
+            {inferredScenario && (
+              <button className="ra-btn" onClick={() => askAboutCohort(inferredScenario)}>
+                <span className="ra-ico"><Icon name="ask" size={13} /></span>
+                Ask about this cohort
+              </button>
+            )}
+            <button className="ra-btn">
+              <span className="ra-ico"><Icon name="spark" size={13} /></span>
+              Explain this collapse
+            </button>
+            <button className="ra-btn">
+              <span className="ra-ico"><Icon name="raids" size={13} /></span>
+              Show related events
+            </button>
+          </div>
+        </div>
+
+        {/* RIGHT: cohort cards or single-player at-this-moment */}
+        <div className="stack lg">
+          {selectedNames.length > 1 && inferredScenario ? (
+            <window.CohortCards
+              scenario={inferredScenario}
+              onAskAbout={askAboutCohort}
+              onSeekTo={setT}
+            />
+          ) : (
+            <>
+              <AtThisMoment t={t} />
+              <LayersCard overlay={overlay} setOverlay={setOverlay} />
+              <window.CohortEmpty onPickScenario={applyScenario} />
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ---------- Arena ---------- */
+const ReplayArena = ({ t, selectedNames, overlay }) => {
+  const players = computeFrame(t);
+
+  // Trails: precompute the last few frames for each player when 'movement' is active.
+  const trails = overlay === "movement"
+    ? [0, 1, 2, 3, 4].map(i => computeFrame(Math.max(0, t - (i + 1) * 6)))
+    : null;
+
+  // Overlay: support chain — draw lines between healers and their target.
+  const supportLines = overlay === "supportchain" ? [
+    { from: "Durracktu", to: "Karthuun" },
+    { from: "Veshrin",   to: "Brorvik" },
+  ] : [];
+
+  // Cohesion ring — visualize spread radius around the cohort centroid.
+  const cohort = players.filter(p => selectedNames.includes(p.name));
+  const centroid = cohort.length > 1 ? {
+    x: cohort.reduce((s, p) => s + p.x, 0) / cohort.length,
+    y: cohort.reduce((s, p) => s + p.y, 0) / cohort.length,
+  } : null;
+  const spread = centroid ? Math.max(...cohort.map(p =>
+    Math.hypot(p.x - centroid.x, p.y - centroid.y)
+  )) : 0;
+
+  return (
+    <div className="replay-stage">
+      <div className="field"></div>
+
+      {/* Movement trails */}
+      {trails && (
+        <svg style={{position: "absolute", inset: 0, pointerEvents: "none"}}
+             viewBox="0 0 100 100" preserveAspectRatio="none">
+          {players.map((p, pi) => {
+            const dim = selectedNames.length > 1 && !selectedNames.includes(p.name);
+            if (dim || p.dead) return null;
+            // Path: current position → backwards through historical frames.
+            const past = trails.map(frame => frame.find(f => f.name === p.name)).filter(Boolean);
+            const d = `M ${p.x.toFixed(2)} ${p.y.toFixed(2)} ` +
+                      past.map(q => `L ${q.x.toFixed(2)} ${q.y.toFixed(2)}`).join(" ");
+            return (
+              <path key={pi}
+                    d={d}
+                    fill="none"
+                    stroke={`var(--c-${p.cls.toLowerCase().replace(/\s/g,"")}, var(--text-dim))`}
+                    strokeWidth="0.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    opacity={p.you ? 0.75 : 0.4}
+                    vectorEffect="non-scaling-stroke" />
+            );
+          })}
+        </svg>
+      )}
+
+      {/* Cluster bomb marker (story-tied: it's what killed the player) */}
+      {t >= 246 && t <= 280 && (
+        <div className="void" style={{
+          left: "calc(50% - 80px)", top: "calc(50% - 80px)",
+          width: 160, height: 160,
+          borderColor: "oklch(0.55 0.15 25)",
+          background: "oklch(0.35 0.15 25 / 0.18)",
+          opacity: Math.min(1, (t - 246) / 8),
+        }}></div>
+      )}
+
+      {/* Cohesion overlay — ring around cohort */}
+      {overlay === "cohesion" && centroid && cohort.length > 1 && (
+        <div style={{
+          position: "absolute",
+          left: `${centroid.x}%`, top: `${centroid.y}%`,
+          width: `${spread * 2}%`, height: `${spread * 2}%`,
+          transform: "translate(-50%, -50%)",
+          borderRadius: "50%",
+          border: "1px dashed var(--ember)",
+          background: "oklch(0.78 0.13 60 / 0.06)",
+          pointerEvents: "none",
+        }}>
+          <div style={{
+            position: "absolute",
+            top: -16, left: "50%", transform: "translateX(-50%)",
+            fontFamily: "var(--font-mono)", fontSize: 9, color: "var(--ember)",
+            whiteSpace: "nowrap", textShadow: "0 1px 2px var(--bg-deep)",
+          }}>cohort spread · {Math.round(spread)} yd</div>
+        </div>
+      )}
+
+      {/* Support chain overlay — lines from healer to target */}
+      {overlay === "supportchain" && (
+        <svg style={{position: "absolute", inset: 0, pointerEvents: "none"}}
+             viewBox="0 0 100 100" preserveAspectRatio="none">
+          {supportLines.map((l, i) => {
+            const from = players.find(p => p.name === l.from);
+            const to = players.find(p => p.name === l.to);
+            if (!from || !to) return null;
+            return (
+              <line key={i}
+                    x1={from.x} y1={from.y} x2={to.x} y2={to.y}
+                    stroke="oklch(0.86 0.14 75)"
+                    strokeWidth="0.3"
+                    strokeDasharray="1 1"
+                    vectorEffect="non-scaling-stroke"
+                    opacity="0.7" />
+            );
+          })}
+        </svg>
+      )}
+
+      {players.map((p, i) => {
+        const inCohort = selectedNames.includes(p.name);
+        const dim = selectedNames.length > 1 && !inCohort;
+        return (
+          <div key={i}
+               className={`pdot ${p.you ? "me" : ""} ${inCohort && !p.you ? "in-cohort" : ""} ${dim ? "fade" : ""}`}
+               style={{
+                 left: `${p.x}%`, top: `${p.y}%`,
+                 background: p.dead ? "var(--text-mute)" : `var(--c-${p.cls.toLowerCase().replace(/\s/g,"")}, var(--text-dim))`,
+                 color: `var(--c-${p.cls.toLowerCase().replace(/\s/g,"")}, var(--text-dim))`,
+                 opacity: p.dead ? 0.4 : (dim ? 0.32 : 1),
+               }}>
+            {(inCohort || p.you || ["tank","heal"].includes(p.role)) && (
+              <span className="nm">{p.name}</span>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+/* Compute approximate player positions at time t. Deterministic. */
+function computeFrame(t) {
+  return window.ROSTER.slice(0, 13).map((p, i) => {
+    const angle = (i / 13) * Math.PI * 2;
+    const baseR = p.role === "tank" ? 0.16 : p.role === "heal" ? 0.28 : 0.32;
+    let bx = 50 + Math.cos(angle) * baseR * 100;
+    let by = 50 + Math.sin(angle) * baseR * 100;
+    if (p.role === "tank") {
+      bx = 50 + Math.cos(angle + t * 0.005) * 12;
+      by = 45 + Math.sin(angle + t * 0.005) * 9;
+    } else {
+      const drift = Math.sin(t * 0.02 + i) * 3.5;
+      bx += drift;
+      by += Math.cos(t * 0.018 + i) * 2.8;
+    }
+    // Story: the player channels in the center then dies at t=272.
+    const out = { ...p, x: bx, y: by, dead: false };
+    if (p.you) {
+      out.x = 50; out.y = 50;
+      if (t >= 272) out.dead = true;
+    }
+    // Volgrim diverges at t=248 (spread scenario)
+    if (p.name === "Volgrim" && t > 230) {
+      const phase = Math.min(1, (t - 230) / 60);
+      out.x = bx + phase * 12;
+    }
+    return out;
+  });
+}
+
+/* ---------- Roster strip ---------- */
+const RosterStrip = ({ roster, selectedNames, onToggle }) => (
+  <div className="roster-strip">
+    {roster.map(p => {
+      const selected = selectedNames.includes(p.name);
+      const pinned = p.you;
+      return (
+        <div key={p.name}
+             className={`roster-chip ${selected ? "selected" : ""} ${pinned ? "pinned" : ""}`}
+             onClick={() => onToggle(p.name)}>
+          <PAvatar name={p.name} hue={p.hue} size="sm" />
+          <span>{p.name}</span>
+          <span className="role-tag">{p.role === "heal" ? "H" : p.role === "tank" ? "T" : "D"}</span>
+        </div>
+      );
+    })}
+  </div>
+);
+
+/* ---------- "At this moment" (single-player view) ---------- */
+const AtThisMoment = ({ t }) => {
+  const past = window.PULL_EVENTS.filter(e => e.t <= t);
+  const last = past[past.length - 1];
+  return (
+    <div className="card flush">
+      <div className="card-head">
+        <h2 className="h2">At this moment</h2>
+        <span className="mono faint" style={{fontSize: 11}}>{fmtT(t)}</span>
+      </div>
+      <div className="card-body">
+        {!last ? <p className="muted">Pull is about to begin.</p> : (
+          <div className="row" style={{alignItems: "center", gap: 10}}>
+            <SpellIcon hue={last.kind === "death" ? 25 : last.kind === "save" ? 165 : 60} glyph={last.ico} />
+            <div>
+              <div style={{fontSize: 14, color: "var(--text)"}}>{last.label}</div>
+              <div className="mono faint" style={{fontSize: 11}}>
+                {fmtT(last.t)} · {last.kind === "death" ? "death event" : last.kind === "save" ? "defensive save" : "cooldown used"}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+/* ---------- Layers ---------- */
+const LayersCard = ({ overlay, setOverlay }) => {
+  const layers = [
+    { id: "cohesion",     label: "Cohort cohesion ring" },
+    { id: "supportchain", label: "Support chain lines" },
+    { id: "movement",     label: "Movement trails" },
+    { id: "damage",       label: "Damage events" },
+    { id: "heals",        label: "Heal traces" },
+  ];
+  return (
+    <div className="card flush">
+      <div className="card-head">
+        <h2 className="h2">Replay layers</h2>
+        <span className="faint mono" style={{fontSize: 11}}>1 active</span>
+      </div>
+      <div className="card-body stack" style={{gap: 4}}>
+        {layers.map(l => (
+          <div key={l.id} className="between" style={{padding: "4px 0"}}>
+            <span style={{fontSize: 13}}>{l.label}</span>
+            <div className={`toggle ${overlay === l.id ? "on" : ""}`}
+                 onClick={() => setOverlay(overlay === l.id ? "none" : l.id)}></div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const fmtT = (t) => `${Math.floor(t/60)}:${String(t%60).padStart(2,"0")}`;
+
+window.ReplayPage = ReplayPage;

@@ -1,0 +1,64 @@
+[
+  {
+    "id": "ob1",
+    "status": "shared",
+    "sharedAt": "12 minutes ago",
+    "raidId": "2026-05-12",
+    "kind": "teamwork",
+    "title": "External CD chain on add wave 1 was the cleanest of the night",
+    "description": "Ardent Defender into Pain Suppression into Ironbark hand-off into Brorvik's Icebound Fortitude. Four overlapping defensives within 26 seconds, zero gaps. Worth a closer look on the replay — maybe a reference for next progression.",
+    "credits": [
+      "Karthuun",
+      "Durracktu",
+      "Brorvik",
+      "Veshrin"
+    ],
+    "binding": {
+      "kind": "cohort",
+      "scenarioId": "extcd",
+      "label": "External CD chain · Mug'Zee Pull 6"
+    },
+    "sources": [
+      "replay 00:28–01:32",
+      "log line 12,402–12,488"
+    ],
+    "fromNoteId": "n3",
+    "viewers": 4
+  },
+  {
+    "id": "ob2",
+    "status": "referenced",
+    "sharedAt": "3 days ago",
+    "raidId": "2026-05-08",
+    "kind": "support",
+    "title": "Maelka has brought Cauldron three raids in a row",
+    "description": "And dropped it before progression each time. Easy to overlook, but it's the kind of quiet generosity that keeps us moving.",
+    "credits": [
+      "Maelka"
+    ],
+    "binding": null,
+    "sources": [],
+    "referencedAt": "2 days ago",
+    "referencedIn": "Retrospective · Tuesday 5/8",
+    "viewers": 11
+  },
+  {
+    "id": "ob3",
+    "status": "withdrawn",
+    "sharedAt": "1 day ago",
+    "raidId": "2026-05-12",
+    "kind": "celebration",
+    "title": "Stix Bunkjunker kill came back from 5 raiders under 8% HP",
+    "description": "Five-person clutch. Maelka and Veshrin chained externals while the surviving DPS finished it.",
+    "credits": [
+      "Maelka",
+      "Veshrin",
+      "Sirelle",
+      "Olben",
+      "Pyrrhic"
+    ],
+    "binding": null,
+    "sources": [],
+    "withdrawnAt": "2 hours ago"
+  }
+]
