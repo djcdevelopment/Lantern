@@ -6,6 +6,14 @@ night?"** — your moments, your saves, your role swap — with the
 advanced replay surface, the local-AI Workshop, and the contribution
 flow all one step deeper.
 
+> **Status — foundation complete, real data in progress.** The full UI
+> (9 routes) is built and verified: typecheck and headless smoke tests
+> pass in both local and cloud modes. It runs today on a hand-authored
+> **bundled dataset** behind a single seam. Wiring the real combat-log
+> parser is planned and underway — see
+> [`docs/REAL-DATA-PLAN.md`](docs/REAL-DATA-PLAN.md) and
+> [`RETROSPECTIVE.md`](RETROSPECTIVE.md).
+
 ## Architecture
 
 A four-layer wiring (modelled on RaidUI v2):
@@ -22,8 +30,9 @@ UI (React)  →  LanternApi (HTTP client)  →  local server  →  dataSource se
 - A **cloud build** bakes every GET to static JSON, so the app is
   deployable to `app.goatsafterdark.org` as a read-only chronicle.
 
-Full detail — shapes, data flow, how to go live — is in
-[`CONTRACTS.md`](CONTRACTS.md).
+Why it is shaped this way is recorded in the
+[Architecture Decision Records](docs/adr/). Full detail — shapes, data
+flow, how to go live — is in [`CONTRACTS.md`](CONTRACTS.md).
 
 ## Stack
 
@@ -85,14 +94,28 @@ server/
   ollama.mjs      local-LLM bridge
   workshop.mjs    Workshop answer assembly
   data/*.json     the bundled dataset + seeds
-scripts/          dev runner · prerender · smoke test
-docs/             PORT_GUIDE.md
-CONTRACTS.md      data shapes + wiring + how to go live
+scripts/          dev runner · prerender · smoke test · research probes
+docs/             ADRs, the real-data plan, the port & research guides
 design-mock/      the original clickable prototype (reference only)
+CONTRACTS.md      data shapes + wiring + how to go live
+RETROSPECTIVE.md  1-day post-mortem of the foundation phase
 ```
+
+## Documentation
+
+| Document | What it covers |
+| --- | --- |
+| [`CONTRACTS.md`](CONTRACTS.md) | Data shapes, the four-layer wiring, the data flow, and the go-live checklist. |
+| [`docs/adr/`](docs/adr/) | Architecture Decision Records — *why* the codebase is shaped the way it is. |
+| [`docs/REAL-DATA-PLAN.md`](docs/REAL-DATA-PLAN.md) | The tiered (T0–T4) plan for wiring real combat-log data behind the seam. |
+| [`docs/PORT_GUIDE.md`](docs/PORT_GUIDE.md) | Porting prototype `.jsx` pages into the real `.tsx` app. |
+| [`docs/research-strategy.md`](docs/research-strategy.md) | How real-data questions are routed and how external facts are gated. |
+| [`docs/research-questions.md`](docs/research-questions.md) | The 14 real-data research questions, routed and answered. |
+| [`RETROSPECTIVE.md`](RETROSPECTIVE.md) | 1-day post-mortem of the foundation and research-method phases. |
 
 ## Going live
 
 Wire the real combat-log parser into `server/dataSource.mjs`, then
 `npm run build:cloud` and deploy `dist/`. No UI changes — see
-[`CONTRACTS.md`](CONTRACTS.md) §8.
+[`CONTRACTS.md`](CONTRACTS.md) §8 and
+[`docs/REAL-DATA-PLAN.md`](docs/REAL-DATA-PLAN.md).
